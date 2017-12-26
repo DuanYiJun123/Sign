@@ -17,6 +17,7 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
 import com.qqduan.faceRecog.core.Defines;
+import com.qqduan.faceRecog.util.DateUtil;
 
 /**
  * 获取token类
@@ -122,5 +123,4 @@ public class AuthService {
 			}
 		}
 	}
-
 }

@@ -9,8 +9,8 @@ public class Defines {
 	
 	public static final String TMPPATH=FileUtil.getAppRoot() + File.separator + "resource" + File.separator + "tmp.txt";
 	
+	public static String TOKEN;
 	public static final String ACC_TOKEN=AuthService.getAuth();
-	public static final String TOKEN="24.da9cb515c775d263e161db7569a7d2b9.2592000.1516802176.282335-10582544";
 	
 	public static final String DETECT="https://aip.baidubce.com/rest/2.0/face/v2/detect";//人脸检测
 	public static final String COMPARE="https://aip.baidubce.com/rest/2.0/face/v2/match";//人脸对比
@@ -24,7 +24,5 @@ public class Defines {
 	public static final String LIST="https://aip.baidubce.com/rest/2.0/face/v2/faceset/group/getlist";//组列表查询
 	public static final String USERS="https://aip.baidubce.com/rest/2.0/face/v2/faceset/group/getusers";//组内用户查询
 	public static final String ADDUSER="https://aip.baidubce.com/rest/2.0/face/v2/faceset/group/adduser";//组间复制用户
-	
-	
 
 }
