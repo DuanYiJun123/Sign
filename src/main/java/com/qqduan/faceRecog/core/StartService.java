@@ -22,7 +22,7 @@ public class StartService {
 		return instance;
 	}
 
-	private void init() {
+	public void init() {
 		File file = new File(Defines.TMPPATH);
 		BufferedReader br = null;
 		try {
