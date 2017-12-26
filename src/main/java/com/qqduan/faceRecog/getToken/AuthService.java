@@ -107,7 +107,7 @@ public class AuthService {
 		BufferedWriter wr = null;
 		try {
 			wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-			wr.write(Defines.ACC_TOKEN);
+			wr.write(AuthService.getAuth());
 			wr.newLine();
 			wr.write(dateNowStr);
 			wr.flush();

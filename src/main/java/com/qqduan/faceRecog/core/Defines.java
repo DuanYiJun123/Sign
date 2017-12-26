@@ -10,7 +10,6 @@ public class Defines {
 	public static final String TMPPATH=FileUtil.getAppRoot() + File.separator + "resource" + File.separator + "tmp.txt";
 	
 	public static String TOKEN;
-	public static final String ACC_TOKEN=AuthService.getAuth();
 	
 	public static final String DETECT="https://aip.baidubce.com/rest/2.0/face/v2/detect";//人脸检测
 	public static final String COMPARE="https://aip.baidubce.com/rest/2.0/face/v2/match";//人脸对比
