@@ -67,7 +67,7 @@ public class Manager
 	}
 
 	@Override
-	public String identify(String group_id, String imgpath, String user_top_num) {
+	public String identify(String group_id, String imgpath, int user_top_num) {
 		String picparam = URLEncoder.encode(FileUtil.FileToBase64(imgpath));
 		String param = "group_id=" + group_id + "&user_top_num=" + user_top_num + "&images=" + picparam;
 		String result = null;
