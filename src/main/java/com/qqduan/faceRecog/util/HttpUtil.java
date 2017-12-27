@@ -8,15 +8,17 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import com.qqduan.faceRecog.core.Defines;
+
 /**
  * http 工具类
  */
 public class HttpUtil {
 
-    public static String post(String requestUrl, String accessToken, String params)
+    public static String post(String requestUrl, String params)
             throws Exception {
         String contentType = "application/x-www-form-urlencoded";
-        return HttpUtil.post(requestUrl, accessToken, contentType, params);
+        return HttpUtil.post(requestUrl, Defines.TOKEN, contentType, params);
     }
 
     public static String post(String requestUrl, String accessToken, String contentType, String params)

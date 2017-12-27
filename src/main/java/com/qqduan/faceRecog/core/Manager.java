@@ -5,13 +5,18 @@ import java.net.URLEncoder;
 import com.qqduan.faceRecog.interfacs.IAdd;
 import com.qqduan.faceRecog.interfacs.ICompare;
 import com.qqduan.faceRecog.interfacs.IDetectFace;
+import com.qqduan.faceRecog.interfacs.IMulti;
+import com.qqduan.faceRecog.interfacs.IQuery;
+import com.qqduan.faceRecog.interfacs.Idelete;
+import com.qqduan.faceRecog.interfacs.Igetlist;
 import com.qqduan.faceRecog.interfacs.Iidentify;
 import com.qqduan.faceRecog.interfacs.Iupdate;
 import com.qqduan.faceRecog.interfacs.Iverify;
 import com.qqduan.faceRecog.util.FileUtil;
 import com.qqduan.faceRecog.util.HttpUtil;
 
-public class Manager implements IDetectFace, IAdd, ICompare, Iidentify, Iupdate, Iverify {
+public class Manager
+		implements IDetectFace, IAdd, ICompare, Iidentify, Iupdate, Iverify, Idelete, Igetlist, IMulti, IQuery {
 
 	@Override
 	public String detectFace(String picPath) {
@@ -19,7 +24,7 @@ public class Manager implements IDetectFace, IAdd, ICompare, Iidentify, Iupdate,
 		String param = "&image=" + picparam;
 		String post = null;
 		try {
-			post = HttpUtil.post(Defines.DETECT, Defines.TOKEN, param);
+			post = HttpUtil.post(Defines.DETECT, param);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -31,19 +36,49 @@ public class Manager implements IDetectFace, IAdd, ICompare, Iidentify, Iupdate,
 
 	@Override
 	public String verify(String uid, String picPath, String group_id) {
-		//TODO
+		String picparam = URLEncoder.encode(FileUtil.FileToBase64(picPath));
+		String param = "group_id=" + group_id + "&uid=" + uid + "&images=" + picparam;
+		String result = null;
+		try {
+			result = HttpUtil.post(Defines.VERIFY, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			return result;
+		}
 		return null;
 	}
 
 	@Override
 	public String update(String uid, String imgpath, String user_info, String group_id) {
-		// TODO Auto-generated method stub
+		String picparam = URLEncoder.encode(FileUtil.FileToBase64(imgpath));
+		String param = "uid=" + uid + "&user_info" + user_info + "&images=" + picparam;
+		String result = null;
+		try {
+			result = HttpUtil.post(Defines.UPDATE, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			return result;
+		}
 		return null;
 	}
 
 	@Override
-	public String identify(String group_id, String imgpath) {
-		// TODO Auto-generated method stub
+	public String identify(String group_id, String imgpath, String user_top_num) {
+		String picparam = URLEncoder.encode(FileUtil.FileToBase64(imgpath));
+		String param = "group_id=" + group_id + "&user_top_num=" + user_top_num + "&images=" + picparam;
+		String result = null;
+		try {
+			result = HttpUtil.post(Defines.IDENTIFY, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			return result;
+		}
 		return null;
 	}
 
@@ -54,11 +89,11 @@ public class Manager implements IDetectFace, IAdd, ICompare, Iidentify, Iupdate,
 		String param = "images=" + imgParam + "," + imgParam2;
 		String result = null;
 		try {
-			result = HttpUtil.post(Defines.COMPARE, Defines.TOKEN, param);
+			result = HttpUtil.post(Defines.COMPARE, param);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(result!=null){
+		if (result != null) {
 			return result;
 		}
 		return null;
@@ -66,8 +101,78 @@ public class Manager implements IDetectFace, IAdd, ICompare, Iidentify, Iupdate,
 
 	@Override
 	public String addFace(String uid, String user_info, String group_id, String image) {
-		// TODO Auto-generated method stub
+		String imgParam = URLEncoder.encode(FileUtil.FileToBase64(image));
+		String param = "uid=" + uid + "&user_info=" + user_info + "&group_id=" + group_id + "&images=" + imgParam;
+		String result = null;
+		try {
+			result = HttpUtil.post(Defines.ADD, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			return result;
+		}
 		return null;
 	}
 
+	@Override
+	public String query(String uid, String group_id) {
+		String param = "uid=" + uid + "&group_id=" + group_id;
+		String result = null;
+		try {
+			result = HttpUtil.post(Defines.QUERY, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			return result;
+		}
+		return null;
+	}
+
+	@Override
+	public String multi(String group_id, String img) {
+		String imgParam = URLEncoder.encode(FileUtil.FileToBase64(img));
+		String param = "group_id=" + group_id + "&images=" + imgParam;
+		String result = null;
+		try {
+			result = HttpUtil.post(Defines.MULTI, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			return result;
+		}
+		return null;
+	}
+
+	@Override
+	public String getlist(int start, int end) {
+		String param = "start=" + start + "&end=" + end;
+		String result = null;
+		try {
+			result = HttpUtil.post(Defines.LIST, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			return result;
+		}
+		return null;
+	}
+
+	@Override
+	public String delete(String uid) {
+		String param = "uid=" + uid;
+		String result = null;
+		try {
+			result = HttpUtil.post(Defines.DELETE, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			return result;
+		}
+		return null;
+	}
 }
