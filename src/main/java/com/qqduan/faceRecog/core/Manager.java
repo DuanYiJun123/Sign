@@ -8,6 +8,7 @@ import com.qqduan.faceRecog.interfacs.IDetectFace;
 import com.qqduan.faceRecog.interfacs.IMulti;
 import com.qqduan.faceRecog.interfacs.IQuery;
 import com.qqduan.faceRecog.interfacs.Idelete;
+import com.qqduan.faceRecog.interfacs.IgetUsers;
 import com.qqduan.faceRecog.interfacs.Igetlist;
 import com.qqduan.faceRecog.interfacs.Iidentify;
 import com.qqduan.faceRecog.interfacs.Iupdate;
@@ -15,8 +16,8 @@ import com.qqduan.faceRecog.interfacs.Iverify;
 import com.qqduan.faceRecog.util.FileUtil;
 import com.qqduan.faceRecog.util.HttpUtil;
 
-public class Manager
-		implements IDetectFace, IAdd, ICompare, Iidentify, Iupdate, Iverify, Idelete, Igetlist, IMulti, IQuery {
+public class Manager implements IDetectFace, IAdd, ICompare, Iidentify, Iupdate, Iverify, Idelete, Igetlist, IMulti,
+		IQuery, IgetUsers {
 
 	@Override
 	public String detectFace(String picPath) {
@@ -175,4 +176,20 @@ public class Manager
 		}
 		return null;
 	}
+
+	@Override
+	public String getUsers(String group_id, int start, int end) {
+		String param = "group_id=" + group_id + "&start" + start + "&end" + end;
+		String result = null;
+		try {
+			result = HttpUtil.post(Defines.USERS, param);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			return result;
+		}
+		return null;
+	}
+	
 }
