@@ -1,34 +1,38 @@
 package com.qqduan.faceRecog.core;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.util.HashSet;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alibaba.fastjson.JSONObject;
+import com.qqduan.faceRecog.util.FileUtil;
 
 public class SignModule {
 
 	private Manager m;
-	private Set<String> pics;
 	private ExecutorService service = Executors.newFixedThreadPool(4);
 	private File file;
 	private boolean flag = false;
 
-	private String uid;
+	private Map<String, String> map;
 	private String group_id;
 
 	public SignModule(String path, String uid, String group_id) {
 		m = new Manager();
-		pics=new HashSet<>();
+		map = new HashMap<>();
 		this.file = new File(path);
 		if (!file.isDirectory()) {
 			throw new RuntimeException("file is not a directory");
 		}
-		this.uid = uid;
 		this.group_id = group_id;
 	}
 
@@ -37,8 +41,8 @@ public class SignModule {
 		File[] listFiles = this.file.listFiles();
 		for (int i = 0; i < listFiles.length; i++) {
 			String name = listFiles[i].getName();
-			if (name.endsWith("jpg") || name.endsWith("png") || name.endsWith("JPG")|| name.endsWith("tif")) {
-				pics.add(listFiles[i].getAbsolutePath());
+			if (name.endsWith("jpg") || name.endsWith("png") || name.endsWith("JPG") || name.endsWith("tif")) {
+				map.put(name, listFiles[i].getAbsolutePath());
 				System.out.println("正在初始化照片  " + name + "====" + num);
 				num++;
 			}
@@ -48,12 +52,12 @@ public class SignModule {
 	public void add() {
 		AtomicInteger succ = new AtomicInteger(1);
 		AtomicInteger fail = new AtomicInteger(1);
-		Iterator<String> it = pics.iterator();
+		Iterator<Entry<String, String>> it = map.entrySet().iterator();
 		for (int i = 0; i < 4; i++) {
 			service.execute(() -> {
 				while (it.hasNext()) {
-					String next = it.next();
-					String result = m.addFace(uid, "注册照片", group_id, next);
+					Entry<String, String> next = it.next();
+					String result = m.addFace(next.getKey(), "注册照片", group_id, next.getValue());
 					JSONObject json = JSONObject.parseObject(result);
 					if (json.containsKey("error_code")) {
 						System.out.println("注册照片  " + next + " 失败" + fail.getAndIncrement());
@@ -85,16 +89,55 @@ public class SignModule {
 		}
 	}
 
-	public void verify(String picPath) {
-		String verify = m.verify(uid, picPath, group_id);
-		JSONObject json = JSONObject.parseObject(verify);
+	public void identify(String picPath) {
+		String identify = m.identify(group_id, picPath, 1);
+		JSONObject json = JSONObject.parseObject(identify);
 		String string = json.getString("result");
-		String substring = string.substring(0, string.length());
-		Integer score = Integer.valueOf(substring);
+		String substring = string.substring(1, string.length() - 1);
+		JSONObject json1 = JSONObject.parseObject(substring);
+		String string2 = json1.getString("scores");
+		Integer score = Integer.valueOf(string2);
+		String name = json1.getString("uid");
 		if (score >= 80) {
-			System.out.println(picPath + "  签到成功！");
+			if (map.containsKey(name)) {
+				System.out.println(name + " 签到成功");
+				map.remove(name);
+			}
+		} else {
+			System.out.println(name + " 没有签到！");
 		}
-
 	}
 
+	public void write() {
+		File file = new File(FileUtil.getAppRoot() + File.separator + "resource" + File.separator + "name.txt");
+		if (file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		BufferedWriter wr = null;
+		try {
+			wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+			if (!map.isEmpty()) {
+				Iterator<Entry<String, String>> it = map.entrySet().iterator();
+				while (it.hasNext()) {
+					Entry<String, String> next = it.next();
+					wr.write(next.getKey());
+					wr.flush();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (wr != null) {
+				try {
+					wr.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 }
