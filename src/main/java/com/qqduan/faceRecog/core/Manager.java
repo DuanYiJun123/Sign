@@ -191,5 +191,5 @@ public class Manager implements IDetectFace, IAdd, ICompare, Iidentify, Iupdate,
 		}
 		return null;
 	}
-	
+
 }

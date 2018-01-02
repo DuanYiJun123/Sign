@@ -1,14 +1,16 @@
 package com.qqduan.faceRecog.core;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,21 +21,41 @@ import com.qqduan.faceRecog.util.FileUtil;
 public class SignModule {
 
 	private Manager m;
-	private ExecutorService service = Executors.newFixedThreadPool(4);
 	private File file;
-	private boolean flag = false;
+	private boolean flag = true;
 
 	private Map<String, String> map;
 	private String group_id;
 
-	public SignModule(String path, String uid, String group_id) {
+	public SignModule(String path, String group_id) {
 		m = new Manager();
-		map = new HashMap<>();
+		map = new ConcurrentHashMap<>();
 		this.file = new File(path);
 		if (!file.isDirectory()) {
 			throw new RuntimeException("file is not a directory");
 		}
 		this.group_id = group_id;
+	}
+
+	public void start() {
+		initSign();
+		add();
+		while (flag) {
+			flag = checkGroup();
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			String picPath = null;
+			try {
+				picPath = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			identify(picPath);
+			if (picPath.equals("done")) {
+				flag = false;
+			}
+		}
+		write();
+		System.out.println("结果已保存");
 	}
 
 	public void initSign() {
@@ -53,28 +75,18 @@ public class SignModule {
 		AtomicInteger succ = new AtomicInteger(1);
 		AtomicInteger fail = new AtomicInteger(1);
 		Iterator<Entry<String, String>> it = map.entrySet().iterator();
-		for (int i = 0; i < 4; i++) {
-			service.execute(() -> {
-				while (it.hasNext()) {
-					Entry<String, String> next = it.next();
-					String result = m.addFace(next.getKey(), "注册照片", group_id, next.getValue());
-					JSONObject json = JSONObject.parseObject(result);
-					if (json.containsKey("error_code")) {
-						System.out.println("注册照片  " + next + " 失败" + fail.getAndIncrement());
-					} else {
-						System.out.println("注册照片  " + next + " 成功" + succ.getAndIncrement());
-					}
-				}
-			});
-			service.shutdown();
-		}
-		while (!service.isTerminated()) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		while (it.hasNext()) {
+			Entry<String, String> next = it.next();
+			String[] split = next.getKey().split("\\.");
+			String result = m.addFace(split[0], "注册照片", group_id, next.getValue());
+			JSONObject json = JSONObject.parseObject(result);
+			if (json.containsKey("error_code")) {
+				System.out.println("注册照片  " + next + " 失败" + fail.getAndIncrement());
+			} else {
+				System.out.println("注册照片  " + next + " 成功" + succ.getAndIncrement());
 			}
 		}
+
 		System.out.println("注册完成");
 	}
 
