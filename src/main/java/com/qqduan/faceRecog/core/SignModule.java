@@ -39,28 +39,44 @@ public class SignModule {
 		flag = checkGroup();
 		if (!flag) {
 			System.out.println("组不存在，创建组并添加人脸");
+			try {
+				System.out.println("准备初始化人脸，并添加人脸");
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			initSign();
 			add();
 			flag = checkGroup();
 		}
-		if(flag){
+		if (flag) {
 			System.out.println("组已存在");
+			try {
+				System.out.println("准备初始化人脸");
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			initSign();
 		}
 		while (flag) {
 			flag = checkGroup();
-			initSign();
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			String picPath = null;
-			String replaceAll=null;
+			String replaceAll = null;
 			try {
 				System.out.println("请输入人脸图片地址： ");
 				picPath = br.readLine();
-				replaceAll = picPath.replaceAll("\\\\", "/");
+				if (picPath.equals("done")) {
+					flag = false;
+				} else {
+					replaceAll = picPath.replaceAll("\\\\", "/");
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			identify(replaceAll);
-			if (picPath.equals("done")) {
-				flag = false;
+			if (replaceAll != null) {
+				identify(replaceAll);
 			}
 		}
 		write();
@@ -73,7 +89,8 @@ public class SignModule {
 		for (int i = 0; i < listFiles.length; i++) {
 			String name = listFiles[i].getName();
 			if (name.endsWith("jpg") || name.endsWith("png") || name.endsWith("JPG") || name.endsWith("tif")) {
-				map.put(name, listFiles[i].getAbsolutePath());
+				String[] split = name.split("\\.");
+				map.put(split[0], listFiles[i].getAbsolutePath());
 				System.out.println("正在初始化照片  " + name + "====" + num);
 				num++;
 			}
@@ -114,19 +131,26 @@ public class SignModule {
 		String identify = m.identify(group_id, picPath, 1);
 		JSONObject json = JSONObject.parseObject(identify);
 		String string = json.getString("result");
-		String substring = string.substring(1, string.length() - 1);
-		JSONObject json1 = JSONObject.parseObject(substring);
-		String string2 = json1.getString("scores");
-		String substring2 = string2.substring(1, string2.length()-1);
-		Float score = Float.valueOf(substring2);
-		String name = json1.getString("uid");
-		if (score >= 80) {
-			if (map.containsKey(name)) {
-				System.out.println(name + " 签到成功");
-				map.remove(name);
-			}
+		if (string == null) {
+			System.out.println("请重新输入正确的人脸图片地址");
 		} else {
-			System.out.println(name + " 没有签到！");
+			String substring = string.substring(1, string.length() - 1);
+			JSONObject json1 = JSONObject.parseObject(substring);
+			String string2 = json1.getString("scores");
+			String substring2 = string2.substring(1, string2.length() - 1);
+			Float score = Float.valueOf(substring2);
+			String name = json1.getString("uid");
+			if (score >= 80) {
+				if (map.containsKey(name)) {
+					System.out.println(name + " 签到成功");
+					System.out.println("分数值为:" + score);
+					map.remove(name);
+				} else {
+					System.out.println("注册照中没有该人 " + name);
+				}
+			} else {
+				System.out.println(name + " 没有签到！");
+			}
 		}
 	}
 
@@ -147,6 +171,7 @@ public class SignModule {
 				while (it.hasNext()) {
 					Entry<String, String> next = it.next();
 					wr.write(next.getKey());
+					wr.newLine();
 					wr.flush();
 				}
 			}

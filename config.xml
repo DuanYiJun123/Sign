@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<!--图片集 -->
+	<path>E:/test-collection/face/idcard_for_base</path>
+	<!--组id -->
+	<group_id>for_test</group_id>
+</root>

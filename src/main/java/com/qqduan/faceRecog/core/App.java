@@ -4,8 +4,7 @@ public class App {
 
 	public static void main(String[] args) {
 		StartService.newInstance().init();
-		SignModule s = new SignModule("E:/test-collection/face/idcard_for_base", "for_test");
+		SignModule s = new SignModule(Defines.path, Defines.group_id);
 		s.start();
 	}
-
 }
