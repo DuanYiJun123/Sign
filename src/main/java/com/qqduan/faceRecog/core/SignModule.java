@@ -11,8 +11,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alibaba.fastjson.JSONObject;
@@ -22,7 +20,7 @@ public class SignModule {
 
 	private Manager m;
 	private File file;
-	private boolean flag = true;
+	private boolean flag = false;
 
 	private Map<String, String> map;
 	private String group_id;
@@ -38,18 +36,29 @@ public class SignModule {
 	}
 
 	public void start() {
-		initSign();
-		add();
+		flag = checkGroup();
+		if (!flag) {
+			System.out.println("组不存在，创建组并添加人脸");
+			add();
+			flag = checkGroup();
+		}
+		if(flag){
+			System.out.println("组已存在");
+		}
 		while (flag) {
 			flag = checkGroup();
+			initSign();
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			String picPath = null;
+			String replaceAll=null;
 			try {
+				System.out.println("请输入人脸图片地址： ");
 				picPath = br.readLine();
+				replaceAll = picPath.replaceAll("\\\\", "/");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			identify(picPath);
+			identify(replaceAll);
 			if (picPath.equals("done")) {
 				flag = false;
 			}
@@ -108,7 +117,8 @@ public class SignModule {
 		String substring = string.substring(1, string.length() - 1);
 		JSONObject json1 = JSONObject.parseObject(substring);
 		String string2 = json1.getString("scores");
-		Integer score = Integer.valueOf(string2);
+		String substring2 = string2.substring(1, string2.length()-1);
+		Float score = Float.valueOf(substring2);
 		String name = json1.getString("uid");
 		if (score >= 80) {
 			if (map.containsKey(name)) {
