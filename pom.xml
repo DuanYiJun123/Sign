@@ -50,7 +50,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>qqduan.test.app.App</mainClass>
+							<mainClass>com.qqduan.faceRecog.core.App</mainClass>
 						</manifest>
 					</archive>
 					<descriptors>
