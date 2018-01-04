@@ -49,7 +49,7 @@ public class SignModule {
 			add();
 			flag = checkGroup();
 		}
-		if (flag) {
+		else {
 			System.out.println("组已存在");
 			try {
 				System.out.println("准备初始化人脸");
