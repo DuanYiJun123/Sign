@@ -119,6 +119,10 @@ public class SignModule {
 				num++;
 			}
 		}
+		if (map.isEmpty()) {
+			System.out.println("图片集路径中没有要注册的图片，请检查config.xml,并重新运行");
+			System.exit(0);
+		}
 	}
 
 	public void add() {
