@@ -22,6 +22,7 @@
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>config.xml</include>
+				<include>resource/**</include>
 			</includes>
 		</fileSet>
 	</fileSets>
