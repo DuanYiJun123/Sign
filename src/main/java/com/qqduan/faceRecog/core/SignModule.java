@@ -3,6 +3,7 @@ package com.qqduan.faceRecog.core;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -86,11 +87,35 @@ public class SignModule {
 	public void initSign() {
 		int num = 1;
 		File[] listFiles = this.file.listFiles();
+		File file = new File(FileUtil.getAppRoot() + File.separator + "resource" + File.separator + "name.txt");
+		if (file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		BufferedWriter wr = null;
+		try {
+			wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+			wr.write("=========全部人员=========");
+			wr.newLine();
+			wr.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		for (int i = 0; i < listFiles.length; i++) {
 			String name = listFiles[i].getName();
 			if (name.endsWith("jpg") || name.endsWith("png") || name.endsWith("JPG") || name.endsWith("tif")) {
 				String[] split = name.split("\\.");
 				map.put(split[0], listFiles[i].getAbsolutePath());
+				try {
+					wr.write(name);
+					wr.newLine();
+					wr.flush();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				System.out.println("正在初始化照片  " + name + "====" + num);
 				num++;
 			}
@@ -151,23 +176,23 @@ public class SignModule {
 				}
 			} else {
 				System.out.println(name + " 没有签到！");
+				System.out.println("最高分数值为：" + score);
 			}
 		}
 	}
 
 	public void write() {
 		File file = new File(FileUtil.getAppRoot() + File.separator + "resource" + File.separator + "name.txt");
-		if (file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		if (!file.exists()) {
+			throw new RuntimeException("name.txt not exist!");
 		}
 		BufferedWriter wr = null;
 		try {
-			wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+			wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true)));
 			if (!map.isEmpty()) {
+				wr.write("=========未签到=========");
+				wr.newLine();
+				wr.flush();
 				Iterator<Entry<String, String>> it = map.entrySet().iterator();
 				while (it.hasNext()) {
 					Entry<String, String> next = it.next();
