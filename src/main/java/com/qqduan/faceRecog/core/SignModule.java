@@ -108,6 +108,7 @@ public class SignModule {
 			JSONObject json = JSONObject.parseObject(result);
 			if (json.containsKey("error_code")) {
 				System.out.println("注册照片  " + next + " 失败" + fail.getAndIncrement());
+				System.out.println("失败信息 " + result);
 			} else {
 				System.out.println("注册照片  " + next + " 成功" + succ.getAndIncrement());
 			}
@@ -120,7 +121,7 @@ public class SignModule {
 		String users = m.getUsers(group_id, 1, 100);
 		JSONObject json = JSONObject.parseObject(users);
 		String result = json.getString("result");
-		if (result != null) {
+		if (!result.equals("[]")) {
 			return true;
 		} else {
 			return false;

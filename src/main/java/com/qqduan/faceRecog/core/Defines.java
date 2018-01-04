@@ -31,7 +31,8 @@ public class Defines {
 	public static String getPath() {
 		Element root = XmlUtil.get(FileUtil.getAppRoot() + File.separator + "config.xml");
 		String result = root.element("path").getData().toString();
-		return result;
+		String replaceAll = result.replaceAll("\\\\", "/");
+		return replaceAll;
 	}
 
 	public static String getId() {
