@@ -3,7 +3,6 @@ package com.qqduan.faceRecog.core;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -154,6 +153,21 @@ public class SignModule {
 	}
 
 	public void identify(String picPath) {
+		File file = new File(picPath);
+		if (file.isDirectory()) {
+			File[] listFiles = file.listFiles();
+			for (int i = 0; i < listFiles.length; i++) {
+				String name = listFiles[i].getName();
+				if (name.endsWith("jpg") || name.endsWith("png") || name.endsWith("JPG") || name.endsWith("tif")) {
+					identy(listFiles[i].getAbsolutePath());
+				}
+			}
+		} else {
+			identy(picPath);
+		}
+	}
+
+	private void identy(String picPath) {
 		String identify = m.identify(group_id, picPath, 1);
 		JSONObject json = JSONObject.parseObject(identify);
 		String string = json.getString("result");
